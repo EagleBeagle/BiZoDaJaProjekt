@@ -1,0 +1,2 @@
+# BiZoDaJaProjekt
+Gépi tanulás projektmunka
