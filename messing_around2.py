@@ -10,6 +10,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import confusion_matrix, classification_report,accuracy_score
+import timeit
 
 
 sentiment140 = pd.read_csv('../training.1600000.processed.noemoticon.csv', encoding="ISO-8859-1")
@@ -53,7 +54,8 @@ def text_processing(tweet):
     
     return normalization(no_punc_tweet)
 
-sentiment140['tweet_list'] = sentiment140['text'].apply(text_processing)
+asd = timeit.default_timer()
+sentiment140['tweet_list'] = sentiment140['text'][:100000].apply(text_processing)
 
 print(text_processing(sentiment140['text'][1]))
 print(sentiment140['text'].iloc[1])
@@ -61,17 +63,7 @@ print(sentiment140['text'].iloc[1])
 
 msg_train, msg_test, label_train, label_test = train_test_split(sentiment140['text'], sentiment140['label'], test_size=0.2)
 
-pipeline = Pipeline([
-    ('bow',CountVectorizer(analyzer=text_processing)),  # strings to token integer counts
-    ('tfidf', TfidfTransformer()),  # integer counts to weighted TF-IDF scores
-    ('classifier', MultinomialNB()),  # train on TF-IDF vectors w/ Naive Bayes classifier
-], verbose=True)
-pipeline.fit(msg_train,label_train)
+asdi = CountVectorizer(analyzer=text_processing)
+basdi = TfidfTransformer(asdi)
+print(timeit.default_timer() - asd)
 
-
-predictions = pipeline.predict(msg_test)
-
-print(classification_report(predictions,label_test))
-print ('\n')
-print(confusion_matrix(predictions,label_test))
-print(accuracy_score(predictions,label_test))
