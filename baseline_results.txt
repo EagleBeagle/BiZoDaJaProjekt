@@ -1,0 +1,17 @@
+[Pipeline] ............... (step 1 of 3) Processing bow, total=60.9min
+[Pipeline] ............. (step 2 of 3) Processing tfidf, total=   1.1s
+[Pipeline] ........ (step 3 of 3) Processing classifier, total=   0.3s
+              precision    recall  f1-score   support
+
+           0       0.79      0.74      0.77    170655
+           4       0.73      0.78      0.75    149345
+
+    accuracy                           0.76    320000
+   macro avg       0.76      0.76      0.76    320000
+weighted avg       0.76      0.76      0.76    320000
+
+
+
+[[126885  43770]
+ [ 33010 116335]]
+0.7600625
