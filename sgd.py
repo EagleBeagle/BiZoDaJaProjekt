@@ -7,15 +7,14 @@ from nltk.stem.wordnet import WordNetLemmatizer
 import re
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import SGDClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import confusion_matrix, classification_report,accuracy_score
-import timeit
 
 
-sentiment140 = pd.read_csv('../training.1600000.processed.noemoticon.csv', encoding="ISO-8859-1")
-sentiment140.columns = ['label', 'id', 'date', 'flag', 'user', 'text']
-sentiment140['length'] = sentiment140['text'].apply(len)
+sentiment140 = pd.read_csv('../train_tweets.csv', encoding="ISO-8859-1")
+#sentiment140.columns = ['label', 'id', 'date', 'flag', 'user', 'text']
+sentiment140['length'] = sentiment140['tweet'].apply(len)
 
 # sns.barplot('label','length',data = sentiment140,palette='PRGn')
 # plt.title('Average Word Length vs Label')
@@ -54,16 +53,26 @@ def text_processing(tweet):
     
     return normalization(no_punc_tweet)
 
-asd = timeit.default_timer()
-sentiment140['tweet_list'] = sentiment140['text'][:100000].apply(text_processing)
+sentiment140['tweet_list'] = sentiment140['tweet'].apply(text_processing)
 
-print(text_processing(sentiment140['text'][1]))
-print(sentiment140['text'].iloc[1])
+print(text_processing(sentiment140['tweet'][1]))
+print(sentiment140['tweet'].iloc[1])
 
 
-msg_train, msg_test, label_train, label_test = train_test_split(sentiment140['text'], sentiment140['label'], test_size=0.2)
+msg_train, msg_test, label_train, label_test = train_test_split(sentiment140['tweet'], sentiment140['label'], test_size=0.2)
 
-asdi = CountVectorizer(analyzer=text_processing)
-basdi = TfidfTransformer(asdi)
-print(timeit.default_timer() - asd)
+print('tanulási')
+pipeline = Pipeline([
+    ('bow',CountVectorizer(analyzer=text_processing)),  # strings to token integer counts
+    ('tfidf', TfidfTransformer()),  # integer counts to weighted TF-IDF scores
+    ('classifier', SGDClassifier()),  # train on TF-IDF vectors w/ Naive Bayes classifier
+], verbose=True)
+pipeline.fit(msg_train,label_train)
+print('kesz')
 
+predictions = pipeline.predict(msg_test)
+
+print(classification_report(predictions,label_test))
+print ('\n')
+print(confusion_matrix(predictions,label_test))
+print(accuracy_score(predictions,label_test))
